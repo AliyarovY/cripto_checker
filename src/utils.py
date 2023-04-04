@@ -60,21 +60,29 @@ def get_price_impact(
         timeframe: str = '1h',
 ) -> int:
     # create prices lists
-    leader_prices = exchange.fetch_ohlcv(leader_symbol, timeframe, limit=window_size)
-    slave_prices = exchange.fetch_ohlcv(slave_symbol, timeframe, limit=window_size)
+    leader_prices = [
+        info[-2]
+        for info in
+        exchange.fetch_ohlcv(leader_symbol, timeframe, limit=window_size)
+    ]
+    slave_prices = [
+        info[-2]
+        for info in
+        exchange.fetch_ohlcv(slave_symbol, timeframe, limit=window_size)
+    ]
 
     # collecting impact in percent
     sum_impacts = 0
     for i in range(1, window_size):
         leader_vector = get_percent_diff([leader_prices[i - 1], leader_prices[i]])
-        slave_vector = get_percent_diff([slave_prices[i - 1], slave_prices[i]])
+    slave_vector = get_percent_diff([slave_prices[i - 1], slave_prices[i]])
 
-        impact = 0
+    impact = 0
 
-        if not any(x == 0 for x in [leader_vector, slave_vector]):
-            impact = slave_vector / leader_vector
+    if not any(x == 0 for x in [leader_vector, slave_vector]):
+        impact = slave_vector / leader_vector
 
-        sum_impacts += impact
+    sum_impacts += impact
 
     # calculate average impact
     result = sum_impacts / (window_size - 1)
