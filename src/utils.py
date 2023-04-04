@@ -75,14 +75,14 @@ def get_price_impact(
     sum_impacts = 0
     for i in range(1, window_size):
         leader_vector = get_percent_diff([leader_prices[i - 1], leader_prices[i]])
-    slave_vector = get_percent_diff([slave_prices[i - 1], slave_prices[i]])
+        slave_vector = get_percent_diff([slave_prices[i - 1], slave_prices[i]])
 
-    impact = 0
+        impact = 0
 
-    if not any(x == 0 for x in [leader_vector, slave_vector]):
-        impact = slave_vector / leader_vector
+        if not any(x == 0 for x in [leader_vector, slave_vector]):
+            impact = slave_vector / leader_vector
 
-    sum_impacts += impact
+        sum_impacts += impact
 
     # calculate average impact
     result = sum_impacts / (window_size - 1)
