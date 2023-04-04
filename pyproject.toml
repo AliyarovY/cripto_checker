@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "cripto-checker"
+version = "1.0"
+description = ""
+authors = ["Yusif"]
+readme = "README.md"
+packages = [{include = "cripto_checker"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ccxt = "^3.0.51"
+pytest = "^7.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
