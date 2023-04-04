@@ -42,9 +42,9 @@ def is_valid_diff(impact: int, prices: list[int], percent: int = 1) -> bool | No
         return None
 
     percent_diff = get_percent_diff(prices)
-    leader_price_diff = get_percent_diff(get_last_prices(symbol='ETH/USDT'))
+    leader_price_diff = get_percent_diff(get_last_prices(symbol='BTC/USDT'))
 
-    if percent_diff is None:
+    if None in (percent_diff, leader_price_diff):
         return None
 
     impact = leader_price_diff * impact
@@ -52,10 +52,16 @@ def is_valid_diff(impact: int, prices: list[int], percent: int = 1) -> bool | No
     return result
 
 
-def get_price_impact(window_size: int = 100) -> int:
+def get_price_impact(
+        window_size: int = 100,
+        exchange: ccxt = ccxt.binance(),
+        leader_symbol: str = 'BTC/USDT',
+        slave_symbol: str = 'ETH/USDT',
+        timeframe: str = '1h',
+) -> int:
     # create prices lists
-    leader_prices = get_last_prices(symbol='ETH/USDT', window_size=window_size)
-    slave_prices = get_last_prices(window_size=window_size)
+    leader_prices = exchange.fetch_ohlcv(leader_symbol, timeframe, limit=window_size)
+    slave_prices = exchange.fetch_ohlcv(slave_symbol, timeframe, limit=window_size)
 
     # collecting impact in percent
     sum_impacts = 0
@@ -66,11 +72,11 @@ def get_price_impact(window_size: int = 100) -> int:
         impact = 0
 
         if not any(x == 0 for x in [leader_vector, slave_vector]):
-            impact = round(slave_vector / leader_vector)
+            impact = slave_vector / leader_vector
 
         sum_impacts += impact
 
     # calculate average impact
-    result = round(sum_impacts / window_size)
+    result = sum_impacts / (window_size - 1)
 
     return result
